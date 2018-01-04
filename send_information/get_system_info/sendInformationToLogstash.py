@@ -20,10 +20,7 @@ while(True):
     network = psutil.net_io_counters().packets_recv
     network_usage = int((network - network_usage) / 5 / 10240)
 
-    obj = {'cpu': cpu,
-           'mem': mem,
-           'disk': disk,
-           'network': network_usage}
+    obj = str(cpu) + ' ' + str(mem) + ' ' + str(disk) + ' ' + str(network)
     print(obj)
 #    psutil.test()
     test_logger.info(obj)
