@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+lfrom pymongo import MongoClient
 import time
 import psutil
 

@@ -1,0 +1,9 @@
+input {
+	udp {
+		port => 5958
+	}
+}
+
+output {
+	stdout { codec => rubydebug }
+}

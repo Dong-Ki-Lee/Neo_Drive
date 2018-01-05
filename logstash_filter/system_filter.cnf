@@ -1,0 +1,39 @@
+input {
+	udp {
+		port => 5959
+	}
+}
+
+filter {
+	json {
+		source => "message"
+		remove_field => [ "level" ]
+		remove_field => [ "logger_name" ]
+		remove_field => [ "path" ]
+	}
+
+	grok {
+		match => {
+			"message" => "%{NUMBER:CPU} %{NUMBER:MEMORY} %{NUMBER:DISK} %{NUMBER:NETWORK}"
+		}
+	}
+	
+	mutate {
+		convert => { "CPU" => "float" }
+		convert => { "MEMORY" => "float" }
+		convert => { "DISK" => "float" }
+		convert => { "NETWORK" => "float" }
+	}
+
+}
+
+output {
+
+	elasticsearch {
+		hosts => "localhost"
+		index => "system_information"
+	}
+
+	stdout { codec => rubydebug }
+	
+}
