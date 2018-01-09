@@ -8,6 +8,14 @@ filter {
 	json {
 		source => "message"
 	}
+	
+	kv { 
+		source => "message"
+		field_split => "()"
+		value_split => ","
+		trim_key => "'"
+		remove_field => [ "message" ]
+	}
 }
 
 output {
