@@ -1,0 +1,11 @@
+1. install logstash deb file
+
+2. go to logstash location => cd /usr/share/logstash/
+
+3. sudo ./bin/logstash -f "filter file location"
+
+3-1. get system information logstash
+sudo ./logstash -f "your_download_location"/Neo_Drive/logstash_filter/system_filter.cnf
+
+3-2. get db information logstash
+sudo ./logstash -f "your_download_location"/Neo_Drive/logstash_filter/db_filter.cnf

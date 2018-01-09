@@ -4,6 +4,12 @@ input {
 	}
 }
 
+filter {
+	json {
+		source => "message"
+	}
+}
+
 output {
 	stdout { codec => rubydebug }
 }
