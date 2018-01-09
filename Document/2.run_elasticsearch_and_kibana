@@ -1,0 +1,19 @@
+1.install elasticsearch with deb file
+
+2.enable elasticsearch service
+sudo systemctl enable elasticsearch.service
+
+3.run elasticsearch service
+sudo service elasticsearch start
+
+3.check elasticsearch
+curl -XGET 'localhost:9200'
+
+4.run kibana
+if you install kibana with deb file, kibana location is /usr/share/kibana/
+so run kibana this command
+sudo /usr/share/kibana/bin/kibana
+
+5.check kibana
+open web browser and go localhost:5601(kibana default port)
+
