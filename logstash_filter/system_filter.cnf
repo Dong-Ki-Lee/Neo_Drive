@@ -35,6 +35,10 @@ filter {
 
 output {
 
+	elasticsearch {
+		hosts => "localhost"
+		index => "system_information"
+	}
 
 	stdout { codec => rubydebug }
 	

@@ -1,0 +1,37 @@
+slow log table setting.
+
+1. using slow query log
+set global slow_query_log = 1;
+
+2. minimum slow query time setting
+set global long_query_time = 'your setting time'
+default is 10 ( 10 second )
+this program, set this time 2 second.
+ex) set global long_query_time = 2;
+
+3. setting about logging query if not use index.
+if you not want this option, pass this.
+set global log_queries_not_using_indexes = 1;
+
+4. choose method of log output.
+this program, using table, not file.
+set global log_output = 'TABLE'
+
+slow log setting end.
+
+test.
+
+select sleep('over your time')
+ex) select sleep(4);
+
+if you setting mysql successfully, you can see this slow query log using next command
+
+select * from mysql.slow_log
+
+
+auto expire setting
+
+set global expire_logs_days = 'your days'
+ex) set global expire_logs_days = 1
+
+
