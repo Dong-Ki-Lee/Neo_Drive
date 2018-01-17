@@ -109,8 +109,7 @@ while True:
     efficiency_of_index_tuple = (('Efficiency_of_index_tuple', int(efficiency_of_index)), )
     db_status_information += efficiency_of_index_tuple
 
-#    test_logger.info(rows+ip_tuple)
-    print(db_status_information + ip_tuple)
+    test_logger.info(db_status_information + ip_tuple)
     sql = 'show processlist;'
     curs.execute(sql)
     rows = curs.fetchall()

@@ -33,7 +33,7 @@ while(True):
     obj = str(cpu) + ' ' + str(mem) + ' ' + str(disk) + ' ' + str(network_usage) + ' ' + cpu_limit + ' ' + ip
     print(obj)
 #    psutil.test()
-#    test_logger.info(obj)
+    test_logger.info(obj)
 
     print("insert one data")
     time.sleep(1)
