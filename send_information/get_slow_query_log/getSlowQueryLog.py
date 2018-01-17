@@ -26,6 +26,6 @@ while True:
 #    test_logger.info(rows+ip_tuple)
     print(rows)
 
-    time.sleep(5)
+    time.sleep(600)
 
 conn.close()

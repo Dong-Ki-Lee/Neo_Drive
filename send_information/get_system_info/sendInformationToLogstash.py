@@ -20,7 +20,8 @@ test_logger.addHandler(logstash.LogstashHandler("164.125.14.150", 5959, version=
 print(psutil.cpu_percent())
 
 network = psutil.net_io_counters().packets_recv
-
+cpu_limit = input("input cpu limit this system : ")
+#network_limit = input("input network limit this system : ")
 while(True):
     cpu = psutil.cpu_percent()
     mem = psutil.virtual_memory().percent
@@ -29,10 +30,10 @@ while(True):
     network = psutil.net_io_counters().packets_recv
     network_usage = int((network - network_usage) / 5 / 10240)
 
-    obj = str(cpu) + ' ' + str(mem) + ' ' + str(disk) + ' ' + str(network_usage) + ' ' + ip
+    obj = str(cpu) + ' ' + str(mem) + ' ' + str(disk) + ' ' + str(network_usage) + ' ' + cpu_limit + ' ' + ip
     print(obj)
 #    psutil.test()
-    test_logger.info(obj)
+#    test_logger.info(obj)
 
     print("insert one data")
     time.sleep(1)
