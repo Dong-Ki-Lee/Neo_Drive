@@ -1,0 +1,42 @@
+input {
+	udp {
+		port => 5958
+	}
+}
+
+filter {
+	json {
+		source => "message"
+	}
+	
+	kv { 
+		source => "message"
+		field_split => "()"
+		value_split => ","
+		trim_key => "'"
+		remove_field => [ "message" ]
+		remove_field => [ "stack_info" ]
+		remove_field => [ "tags" ]
+		remove_field => [ "logger_name" ]
+		remove_field => [ "path" ]
+	}
+
+	mutate {
+		convert => { "Average_sent_per_question" => "float" }
+		convert => { "Efficiency_of_index_tuple" => "integer" }
+		convert => { "Questions_per_minute" => "integer" }
+		convert => { "Disk_access_per_minute" => "integer" }
+		convert => { "Bytes_sent_per_minute" => "integer" }
+	}
+}
+
+output {
+
+	elasticsearch {
+		hosts => "localhost"
+		index => "db_information"
+	}
+
+	stdout { codec => rubydebug }
+
+}

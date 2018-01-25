@@ -28,6 +28,17 @@ filter {
 		convert => { "key_writes" => integer }
 		convert => { "Connections" => integer }
 		convert => { "Aborted_connects" => integer}
+		convert => { "Bytes_sent" => integer}
+		convert => { "Bytes_received" => integer}
+		convert => { "Questions" => integer}
+		convert => { "Uptime" => integer}
+		convert => { "Connections" => integer}
+		convert => { "Created_tmp_disk_tables" => integer}
+		convert => { "Com_insert" => integer}
+		convert => { "Com_update" => integer}
+		convert => { "Com_delete" => integer}
+		convert => { "Handler_read_rnd_next" => integer}
+		convert => { "Com_select" => integer}
 	}
 }
 
@@ -35,7 +46,7 @@ output {
 
 	elasticsearch {
 		hosts => "localhost"
-		index => "db_information"
+		index => "db_information_fix"
 	}
 
 	stdout { codec => rubydebug }
