@@ -16,16 +16,13 @@ s.close()
 client = MongoClient('164.125.14.151', 26543)
 db = client.server_data
 coll = db["error_log"]
-conn = pymysql.connect(host='localhost', user='monitoring', password='monitoringtest', charset='utf8')
 
 test_logger = logging.getLogger('python-logstash-logger')
 test_logger.setLevel(logging.INFO)
 test_logger.addHandler(logstash.LogstashHandler("164.125.14.150", 5958, version=1))
 
-curs = conn.cursor()
 # normal value
-select_full_join = '0'
-select_range_check = '0'
+NORMAL = '0'
 
 pre_questions = 0
 pre_bytes_sent = 0
@@ -38,11 +35,13 @@ pre_com_select = 0
 uptime_monitoring_client = 0
 
 while True:
+    conn = pymysql.connect(host='localhost', user='monitoring', password='monitoringtest', charset='utf8')
+    curs = conn.cursor()
     sql = 'show status;'
     curs.execute(sql)
     rows = curs.fetchall()
     status = dict(rows)
-
+    print(rows)
     # initiating
     if uptime_monitoring_client == 0:
         pre_created_tmp_disk_tables = status['Created_tmp_disk_tables']
@@ -53,11 +52,12 @@ while True:
         pre_handler_read_rnd_next = status['Handler_read_rnd_next']
         pre_com_select = status['Com_select']
         uptime_monitoring_client += 1
+        conn.close()
         time.sleep(60)
         continue
 
     # Select_full_join
-    if status['Select_full_join'] != select_full_join:
+    if status['Select_full_join'] != NORMAL:
         t = time.localtime()
         error_log = {'error_name': "Select_full_join",
                      'error_time': time.asctime(t),
@@ -68,7 +68,7 @@ while True:
         # send information to mongodb
 
     # Select_range_check
-    if status['Select_range_check'] != select_range_check:
+    if status['Select_range_check'] != NORMAL:
         t = time.localtime()
         error_log = {'error_name': "Select_range_check",
                      'error_time': time.asctime(t),
@@ -88,9 +88,13 @@ while True:
     questions_per_minute_tuple = (('Questions_per_minute', int(status['Questions']) - int(pre_questions)), )
     pre_questions = status['Questions']
     db_status_information += questions_per_minute_tuple
+    try:
+        average_sent_per_question_tuple = (('Average_sent_per_question', int(bytes_sent_tuple[0][1])
+                                            / int(questions_per_minute_tuple[0][1])), )
+    except ZeroDivisionError:
+        average_sent_per_question_tuple = 0
 
-    average_sent_per_question_tuple = (('Average_sent_per_question', int(bytes_sent_tuple[0][1])
-                                        / int(questions_per_minute_tuple[0][1])), )
+    average_sent_per_question_tuple = (('Average_sent_per_question_tuple', average_sent_per_question_tuple), )
     db_status_information += average_sent_per_question_tuple
 
     disk_access_per_minute_tuple = (('Disk_access_per_minute',
@@ -110,13 +114,14 @@ while True:
     db_status_information += efficiency_of_index_tuple
 
     test_logger.info(db_status_information + ip_tuple)
+    print(db_status_information)
     sql = 'show processlist;'
     curs.execute(sql)
     rows = curs.fetchall()
 #    test_logger.info(rows)
+    conn.close()
 
     time.sleep(60)
 
-conn.close()
 
 
