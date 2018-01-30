@@ -12,14 +12,19 @@ ip = s.getsockname()[0]
 print(ip)
 s.close()
 
-client = MongoClient('164.125.14.150', 26543)
+server_ip = "164.125.14.150"
+
+client = MongoClient(server_ip, 26543)
 db = client.client_system_limit_error
 db_information = client.client_access_log
 
-test_logger = logging.getLogger('python-logstash-logger')
-test_logger.setLevel(logging.INFO)
-test_logger.addHandler(logstash.LogstashHandler("164.125.14.150", 5959, version=1))
+system_information_logger = logging.getLogger('system_information_logger')
+system_information_logger.setLevel(logging.INFO)
+system_information_logger.addHandler(logstash.LogstashHandler(server_ip, 5959, version=1))
 
+system_error_logger = logging.getLogger('error_logger')
+system_error_logger.setLevel(logging.INFO)
+system_error_logger.addHandler(logstash.LogstashHandler(server_ip, 5957, version=1))
 
 print(psutil.cpu_percent())
 
@@ -48,7 +53,7 @@ while(True):
     obj = str(cpu) + ' ' + str(mem) + ' ' + str(disk) + ' ' + str(network_usage) + ' ' + cpu_usage_limit + ' ' + ip
     print(obj)
 #    psutil.test()
-    test_logger.info(obj)
+    system_information_logger.info(obj)
 
     print("insert one data")
 
@@ -61,9 +66,11 @@ while(True):
             obj = {
                 'IP': ip,
                 'occur_time': time.asctime(t),
-                'error_name': 'CPU Usage over limit'
+                'error_name': 'CPU_Usage_over_limit'
             }
             coll.insert_one(obj)
+            elastic_obj = ip + ' ' + 'CPU_Usage_over_limit'
+            system_error_logger.info(elastic_obj)
             print("send cpu limit error")
             cpu_over_limit_time = 0
     else:

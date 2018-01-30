@@ -37,7 +37,7 @@ uptime_monitoring_client = 0
 while True:
     conn = pymysql.connect(host='localhost', user='monitoring', password='monitoringtest', charset='utf8')
     curs = conn.cursor()
-    sql = 'show status;'
+    sql = 'show global status;'
     curs.execute(sql)
     rows = curs.fetchall()
     status = dict(rows)
