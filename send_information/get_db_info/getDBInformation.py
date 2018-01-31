@@ -89,8 +89,7 @@ while True:
     pre_questions = status['Questions']
     db_status_information += questions_per_minute_tuple
     try:
-        average_sent_per_question_tuple = (('Average_sent_per_question', int(bytes_sent_tuple[0][1])
-                                            / int(questions_per_minute_tuple[0][1])), )
+        average_sent_per_question_tuple = int(bytes_sent_tuple[0][1]) / int(questions_per_minute_tuple[0][1])
     except ZeroDivisionError:
         average_sent_per_question_tuple = 0
 
