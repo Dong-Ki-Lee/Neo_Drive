@@ -1,0 +1,39 @@
+input {
+	udp {
+		port => 5957
+	}
+}
+
+filter {
+	json {
+		source => "message"
+		remove_field => [ "level" ]
+		remove_field => [ "logger_name" ]
+		remove_field => [ "path" ]
+		remove_field => [ "tags" ]
+		remove_field => [ "stack_info" ]
+	}
+
+	grok {
+		match => {
+			"message" => "%{IP:CLIENT_IP} %{WORD:ERROR_NAME}"
+		}
+
+		remove_field => [ "message" ]
+		remove_field => [ "host" ]
+		remove_field => [ "@version" ]
+		remove_field => [ "type" ]
+	}
+	
+}
+
+output {
+
+	elasticsearch {
+		hosts => "localhost"
+		index => "error_information"
+	}
+
+	stdout { codec => rubydebug }
+	
+}

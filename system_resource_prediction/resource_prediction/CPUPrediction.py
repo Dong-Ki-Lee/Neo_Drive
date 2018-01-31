@@ -2,10 +2,22 @@ import elasticsearch
 import datetime
 
 
+def calculate_future_usage(input_list):
+    for i in range(0, 14):
+        diff = input_list[i + 7] - input_list[i]
+        input_list.append(input_list[i + 7] + diff)
+    return input_list
+
+
+# Time to calculate the past. Here, based on current
 timestamp = datetime.datetime.now().timestamp()
+# Modify elasticsearch timestamp format
 timestamp = int(timestamp*1000)
 
+# Connect Elasticsearch for getting Usage Value. Now just calculate CPU
 es_client = elasticsearch.Elasticsearch("localhost:9200")
+
+ip = "192.168.137.24"
 
 docs = es_client.search(index='system_information',
                         doc_type='doc',
@@ -68,18 +80,27 @@ docs = es_client.search(index='system_information',
                           }
                         })
 
-print(len(docs['aggregations']['2']['buckets']))
-# After programming, use this value if result value is over 2 week
+# More than 14 days of data must be stored to perform the calculation
+if (len(docs['aggregations']['2']['buckets'])) >= 14:
 
-test_list = []
+    cpu_usage_list = []
 
-for doc in docs['aggregations']['2']['buckets']:
-    print(int(doc['1']['value']))
-    test_list.append(int(doc['1']['value']))
+    # Add list CPU usage past 2 weeks
+    for doc in docs['aggregations']['2']['buckets']:
+        print(int(doc['1']['value']))
+        cpu_usage_list.append(int(doc['1']['value']))
 
-print(test_list)
-print(test_list[1])
-#print(docs['aggregations']['2']['buckets'])
-#print(json.dumps(docs['aggregations']['2']['buckets'], indent=2))
+    # Call function calculate future usage
+    cpu_usage_list = calculate_future_usage(cpu_usage_list)
 
-#print(es_client.indices.get_alias().keys())
+    # Convert to the format used by elasticsearch
+
+    # Delete historical data from elasticsearch
+
+    # Insert new prediction data
+
+# Less than 14 days of data pass this calculation
+# else:
+    # if need another process, write this place
+
+# close connection
