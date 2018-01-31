@@ -4,8 +4,6 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-MAIL_ACCOUNT = "vinedingproject@gmail.com"
-MAIL_PASSWORD = "onlysendmail"
 TITLE = ""
 CONTENT = ""
 
