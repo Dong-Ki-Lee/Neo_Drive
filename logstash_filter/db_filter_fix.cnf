@@ -22,7 +22,7 @@ filter {
 	}
 
 	mutate {
-		convert => { "Average_sent_per_question" => "float" }
+		convert => { "Average_sent_per_question_tuple" => "float" }
 		convert => { "Efficiency_of_index_tuple" => "integer" }
 		convert => { "Questions_per_minute" => "integer" }
 		convert => { "Disk_access_per_minute" => "integer" }

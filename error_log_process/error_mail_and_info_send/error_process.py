@@ -4,28 +4,32 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-MAIL_ACCOUNT = ""
-MAIL_PASSWORD = ""
+MAIL_ACCOUNT = "vinedingproject@gmail.com"
+MAIL_PASSWORD = "onlysendmail"
 TITLE = ""
 CONTENT = ""
 
 
-def send_via_gmail(to, title, description):
-    from_address = MAIL_ACCOUNT
-    msg = get_message_formatted(from_address, to, title, description)
-
+def send_via_gmail(to_list, title, description):
     try:
+        from_address = MAIL_ACCOUNT
         s = smtplib.SMTP('smtp.gmail.com:587')
         s.starttls()
         s.login(MAIL_ACCOUNT, MAIL_PASSWORD)
-        s.sendmail(from_address, to, msg.as_string())
+        msg = get_message_formatted(from_address, title, description)
+        for to in to_list:
+            try:
+                s.sendmail(from_address, to, msg.as_string())
 
+            except Exception as e:
+                print(e)
+                print("email_send_error")
     except Exception as e:
         print(e)
-        print("error")
+        print("login error")
 
 
-def get_message_formatted(from_address, to, title, description):
+def get_message_formatted(from_address, title, description):
     msg = MIMEMultipart('localhost')
     msg['Subject'] = title
     msg['From'] = from_address
@@ -106,8 +110,13 @@ test_list2 = get_error_host_and_description()
 
 content = ''
 for list in test_list2:
-    content += 'host : ' + list['_id']['IP'] + ' error name : ' + list['_id']['error_name'] + ' ' + str(list['count']) + ' times alert\n'
+    content += 'host : ' \
+               + list['_id']['IP'] \
+               + ' error name : ' \
+               + list['_id']['error_name'] \
+               + ' ' + str(list['count']) \
+               + ' times alert\n'
 
 print(content)
 
-send_via_gmail(test_list[0], "test_email", content)
+send_via_gmail(test_list, "test_email", content)

@@ -5,7 +5,13 @@ import datetime
 def calculate_future_usage(input_list):
     for i in range(0, 14):
         diff = input_list[i + 7] - input_list[i]
-        input_list.append(input_list[i + 7] + diff)
+        next_prediction = input_list[i + 7] + diff
+
+        if next_prediction >= 5:
+            input_list.append(next_prediction)
+        else:
+            last_week_value = input_list[i+7]
+            input_list.append(last_week_value)
     return input_list
 
 
@@ -66,7 +72,7 @@ docs = es_client.search(index='system_information',
                                 {
                                   "range": {
                                     "@timestamp": {
-                                      "gte": timestamp - 2419200000,
+                                      "gte": timestamp - 1209600000,
                                       "lte": timestamp,
                                       "format": "epoch_millis"
                                     }
@@ -87,12 +93,15 @@ if (len(docs['aggregations']['2']['buckets'])) >= 14:
 
     # Add list CPU usage past 2 weeks
     for doc in docs['aggregations']['2']['buckets']:
-        print(int(doc['1']['value']))
+        # print(int(doc['1']['value']))
         cpu_usage_list.append(int(doc['1']['value']))
 
-    # Call function calculate future usage
-    cpu_usage_list = calculate_future_usage(cpu_usage_list)
+    if len(cpu_usage_list) > 14:
+        cpu_usage_list = cpu_usage_list[1:]
 
+    # Call function calculate future usage
+    cpu_usage_prediction_list = calculate_future_usage(cpu_usage_list)
+    print(cpu_usage_prediction_list)
     # Convert to the format used by elasticsearch
 
     # Delete historical data from elasticsearch
