@@ -49,7 +49,6 @@ def get_administrator_email_list():
         output_list = []
 
         for admin in admin_list:
-            print(admin['email_address'])
             output_list.append(admin['email_address'])
 
         return output_list
@@ -100,21 +99,25 @@ def get_error_host_and_description():
 # send problem data to information viewer
 
 # send problem data to administrator use email
+while(True):
+    administrator_list = get_administrator_email_list()
 
-test_list = get_administrator_email_list()
-print(test_list[0])
+    error_list = get_error_host_and_description()
 
-test_list2 = get_error_host_and_description()
+    content = ''
+    if len(error_list) > 0:
+        for error in error_list:
+            content += 'host : ' \
+                       + error['_id']['IP'] \
+                       + ' error name : ' \
+                       + error['_id']['error_name'] \
+                       + ' ' + str(error['count']) \
+                       + ' times alert\n'
 
-content = ''
-for list in test_list2:
-    content += 'host : ' \
-               + list['_id']['IP'] \
-               + ' error name : ' \
-               + list['_id']['error_name'] \
-               + ' ' + str(list['count']) \
-               + ' times alert\n'
+        print(content)
 
-print(content)
-
-send_via_gmail(test_list, "test_email", content)
+        send_via_gmail(administrator_list, "test_email", content)
+    else:
+        print("no_error_list")
+    print("wait 5 minutes")
+    time.sleep(300)

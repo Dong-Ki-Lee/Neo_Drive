@@ -1,5 +1,6 @@
 import elasticsearch
 import datetime
+import time
 
 
 def calculate_future_usage(input_list):
@@ -124,5 +125,9 @@ def insert_future_data(ip):
         # if need another process, write this place
 
     # close connection
-ip = "192.168.137.24"
-insert_future_data(ip)
+
+
+while(True):
+    ip = "192.168.137.24"
+    insert_future_data(ip)
+    time.sleep(86400)
