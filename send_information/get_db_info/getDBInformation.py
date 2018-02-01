@@ -93,7 +93,7 @@ while True:
     except ZeroDivisionError:
         average_sent_per_question_tuple = 0
 
-    average_sent_per_question_tuple = (('Average_sent_per_question_tuple', average_sent_per_question_tuple), )
+    average_sent_per_question_tuple = (('Average_sent_per_question', average_sent_per_question_tuple), )
     db_status_information += average_sent_per_question_tuple
 
     disk_access_per_minute_tuple = (('Disk_access_per_minute',
