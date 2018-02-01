@@ -27,6 +27,10 @@ filter {
 		convert => { "Questions_per_minute" => "integer" }
 		convert => { "Disk_access_per_minute" => "integer" }
 		convert => { "Bytes_sent_per_minute" => "integer" }
+		convert => { "Select" => "integer" }
+		convert => { "Insert" => "integer" }
+		convert => { "Update" => "integer" }
+		convert => { "Delete" => "integer" }
 	}
 }
 
