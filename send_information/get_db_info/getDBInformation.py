@@ -67,7 +67,6 @@ def insert_data_in_mongodb(json_data):
 def database_error_check(pre_database_status, database_status):
 
     # Select_full_join
-    print(database_status['Select_full_join'])
     select_full_join = int(database_status['Select_full_join']) - int(pre_database_status['Select_full_join'])
     if select_full_join != NORMAL:
         t = time.localtime()
@@ -125,7 +124,6 @@ while True:
     database_status = get_result_sql_execute(status_sql_query)
 
     database_error_check(pre_database_status, database_status)
-
     # Send DB status information to logstash
 
     db_status_information = ()
@@ -183,6 +181,22 @@ while True:
     delete_tuple = (('Delete',
                      int(database_status['Com_delete']) - int(pre_database_status['Com_delete'])),)
     db_status_information += delete_tuple
+
+    innodb_buffer_pool_reads = int(database_status['Innodb_buffer_pool_reads']) \
+                               - int(pre_database_status['Innodb_buffer_pool_reads'])
+
+    innodb_buffer_pool_read_requests = int(database_status['Innodb_buffer_pool_read_requests']) \
+                                       - int(pre_database_status['Innodb_buffer_pool_read_requests'])
+
+    cache_rate = 0
+    if innodb_buffer_pool_read_requests == 0:
+        cache_rate = 0
+    else:
+        cache_rate = innodb_buffer_pool_reads * 100 / innodb_buffer_pool_read_requests
+
+        cache_rate_tuple = (('Cache_rate', int(cache_rate)), )
+
+    db_status_information += cache_rate_tuple
 
     db_status_information += ip_tuple
 
