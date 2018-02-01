@@ -4,6 +4,8 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+MAIL_ACCOUNT = "vinedingproject@gmail.com"
+MAIL_PASSWORD = "onlysendmail"
 TITLE = ""
 CONTENT = ""
 
@@ -83,6 +85,7 @@ def get_error_host_and_description():
             print(error)
             output_list.append(error)
 
+        error_coll.drop()
         return output_list
 
     except Exception as e:
