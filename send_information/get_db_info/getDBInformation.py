@@ -9,6 +9,7 @@ MONITORING_SERVER_IP = '164.125.14.150'
 MONITORING_SERVER_MONGODB_PORT = 26543
 MONITORING_SERVER_DB_INFO_LOGSTASH_PORT = 5958
 
+# Database ID and Password
 DATABASE_ID = 'monitoring'
 DATABASE_PW = 'monitoringtest'
 # normal value
@@ -170,10 +171,22 @@ while True:
 
     db_status_information += efficiency_of_index_tuple
 
-    pre_com_select = pre_database_status['Com_select']
-    pre_handler_read_rnd_next = pre_database_status['Handler_read_rnd_next']
+    select_tuple = (('Select',
+                     int(database_status['Com_select']) - int(pre_database_status['Com_select'])),)
+    db_status_information += select_tuple
+    insert_tuple = (('Insert',
+                     int(database_status['Com_insert']) - int(pre_database_status['Com_insert'])),)
+    db_status_information += insert_tuple
+    update_tuple = (('Update',
+                     int(database_status['Com_update']) - int(pre_database_status['Com_update'])),)
+    db_status_information += update_tuple
+    delete_tuple = (('Delete',
+                     int(database_status['Com_delete']) - int(pre_database_status['Com_delete'])),)
+    db_status_information += delete_tuple
 
-    db_information_logger.info(db_status_information + ip_tuple)
+    db_status_information += ip_tuple
+
+    db_information_logger.info(db_status_information)
     print(db_status_information)
     status_sql_query = 'show processlist;'
 
