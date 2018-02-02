@@ -122,7 +122,7 @@ while True:
     time.sleep(60)
 
     database_status = get_result_sql_execute(status_sql_query)
-
+    print(database_status)
     database_error_check(pre_database_status, database_status)
     # Send DB status information to logstash
 
@@ -140,7 +140,7 @@ while True:
 
     average_sent_per_question = 0
     try:
-        average_sent_per_question = int(bytes_sent_tuple[0][1]) / int(questions_per_minute_tuple[0][1])
+        average_sent_per_question = int(int(bytes_sent_tuple[0][1]) / int(questions_per_minute_tuple[0][1]))
     except ZeroDivisionError:
         average_sent_per_question = 0
 
@@ -197,6 +197,16 @@ while True:
         cache_rate_tuple = (('Cache_rate', int(cache_rate)), )
 
     db_status_information += cache_rate_tuple
+
+    data_written_tuple = (('Data_written',
+                           (int(database_status['Innodb_data_written'])
+                            - int(pre_database_status['Innodb_data_written']))/1024),)
+    db_status_information += data_written_tuple
+
+    data_read_tuple = (('Data_read',
+                           (int(database_status['Innodb_data_read'])
+                            - int(pre_database_status['Innodb_data_read']))/1024),)
+    db_status_information += data_read_tuple
 
     db_status_information += ip_tuple
 
