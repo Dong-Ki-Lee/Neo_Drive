@@ -31,6 +31,9 @@ filter {
 		convert => { "Insert" => "integer" }
 		convert => { "Update" => "integer" }
 		convert => { "Delete" => "integer" }
+		convert => { "Cache_rate" => "integer" }
+		convert => { "Data_written" => "integer" }
+		convert => { "Data_read" => "integer" }
 	}
 }
 
