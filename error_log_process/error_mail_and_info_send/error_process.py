@@ -6,8 +6,6 @@ from email.mime.text import MIMEText
 
 MAIL_ACCOUNT = "vinedingproject@gmail.com"
 MAIL_PASSWORD = "onlysendmail"
-TITLE = ""
-CONTENT = ""
 
 
 def send_via_gmail(to_list, title, description):
@@ -54,11 +52,21 @@ def get_administrator_email_list():
             output_list.append(admin['email_address'])
 
         return output_list
-        # collection.remove({"search_word": search_word})
     except Exception as e:
         print(e)
     finally:
         client.close()
+
+
+def create_email_content(error_json):
+
+    email_content = 'host : ' \
+               + error_json['_id']['error_ip'] \
+               + ' error name : ' \
+               + error_json['_id']['error_name'] \
+               + ' ' + str(error_json['count']) \
+               + ' times alert\n'
+    return email_content
 
 
 def get_error_host_and_description():
@@ -67,13 +75,13 @@ def get_error_host_and_description():
         client = pymongo.MongoClient("localhost", 26543)
 
         # setting database and collection name
-        error_db = client["client_system_limit_error"]
-        error_coll = error_db["cpu_over_limit"]
+        error_db = client["server_data"]
+        error_coll = error_db["error_log"]
         error_aggregation = error_coll.aggregate(
             [
                 {
                     "$group": {
-                        "_id": {"error_name": "$error_name", "IP": "$IP"},
+                        "_id": {"error_name": "$error_name", "error_ip": "$error_ip"},
                         "count": {"$sum": 1}
                     }
                 }
@@ -93,15 +101,8 @@ def get_error_host_and_description():
     finally:
         client.close()
 
-# read problem data from mongodb
+alarm_timing = input("input alarm interval(minute) : ")
 
-# remove duplication
-
-# remove old data from elasticsearch
-
-# send problem data to information viewer
-
-# send problem data to administrator use email
 while(True):
     administrator_list = get_administrator_email_list()
 
@@ -110,17 +111,12 @@ while(True):
     content = ''
     if len(error_list) > 0:
         for error in error_list:
-            content += 'host : ' \
-                       + error['_id']['IP'] \
-                       + ' error name : ' \
-                       + error['_id']['error_name'] \
-                       + ' ' + str(error['count']) \
-                       + ' times alert\n'
+            content += create_email_content(error)
 
         print(content)
 
-        send_via_gmail(administrator_list, "test_email", content)
+        send_via_gmail(administrator_list, "Alarm_email", content)
     else:
         print("no_error_list")
-    print("wait 5 minutes")
-    time.sleep(300)
+    print("wait " + str(alarm_timing) + " minutes")
+    time.sleep(60 * int(alarm_timing))
