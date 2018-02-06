@@ -8,6 +8,7 @@ import socket
 MONITORING_SERVER_IP = '164.125.14.150'
 MONITORING_SERVER_MONGODB_PORT = 26543
 MONITORING_SERVER_DB_INFO_LOGSTASH_PORT = 5958
+MONITORING_SERVER_ERROR_INFO_LOGSTASH_PORT = 5957
 
 # Database ID and Password
 DATABASE_ID = 'monitoring'
@@ -15,6 +16,13 @@ DATABASE_PW = 'monitoringtest'
 # normal value
 NORMAL = 0
 
+system_error_logger = logging.getLogger('error_logger')
+system_error_logger.setLevel(logging.INFO)
+system_error_logger.addHandler(logstash.LogstashHandler(
+    MONITORING_SERVER_IP,
+    MONITORING_SERVER_ERROR_INFO_LOGSTASH_PORT,
+    version=1)
+)
 
 def get_ip_address():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -69,6 +77,8 @@ def database_error_check(pre_database_status, database_status):
     # Select_full_join
     select_full_join = int(database_status['Select_full_join']) - int(pre_database_status['Select_full_join'])
     if select_full_join != NORMAL:
+
+        # send information to mongodb
         t = time.localtime()
 
         error_log = {'error_name': "Select_full_join",
@@ -77,11 +87,18 @@ def database_error_check(pre_database_status, database_status):
 
         insert_data_in_mongodb(error_log)
         print("Select_full_join error sending")
-        # send information to mongodb
+
+        # send information to logstash
+        elastic_obj = ip + ' ' + 'Select_full_join'
+        system_error_logger.info(elastic_obj)
+        print("send cpu limit error")
+
 
     # Select_range_check
     select_range_check = int(database_status['Select_range_check']) - int(pre_database_status['Select_range_check'])
     if select_range_check != NORMAL:
+
+        # send information to mongodb
         t = time.localtime()
 
         error_log = {'error_name': "Select_range_check",
@@ -90,7 +107,12 @@ def database_error_check(pre_database_status, database_status):
 
         insert_data_in_mongodb(error_log)
         print("Select_range_check error sending")
-        # send information to mongodb
+
+        # send information to logstash
+        elastic_obj = ip + ' ' + 'Select_range_check'
+        system_error_logger.info(elastic_obj)
+        print("send cpu limit error")
+
 
 
 db_information_logger = logging.getLogger('db_information')
