@@ -1,0 +1,40 @@
+input {
+	udp {
+		port => 5956
+	}
+}
+
+filter {
+	json {
+		source => "message"
+	}
+	
+	kv { 
+		source => "message"
+		field_split => "()"
+		value_split => ","
+		trim_key => "'"
+		remove_field => [ "message" ]
+		remove_field => [ "stack_info" ]
+		remove_field => [ "tags" ]
+		remove_field => [ "logger_name" ]
+		remove_field => [ "path" ]
+		remove_field => [ "type" ]
+		remove_field => [ "level" ]
+		remove_field => [ "@version" ]
+		remove_field => [ "@timestamp" ]
+		remove_field => [ "host" ]
+	}
+
+}
+
+output {
+
+	elasticsearch {
+		hosts => "localhost"
+		index => "query_information"
+	}
+
+	stdout { codec => rubydebug }
+
+}

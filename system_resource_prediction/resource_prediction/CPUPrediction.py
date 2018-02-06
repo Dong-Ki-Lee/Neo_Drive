@@ -126,6 +126,9 @@ def insert_future_data(ip):
 
     # close connection
 
+# get ip address about connected server
+def get_ip_address_list():
+
 
 while(True):
     ip = "192.168.137.24"
