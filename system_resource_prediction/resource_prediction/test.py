@@ -1,7 +1,37 @@
-input_list = [8, 7, 3, 7, 7, 7, 5, 10, 8, 6, 7, 9, 8, 7]
 
-for i in range(0, 28):
-    diff = input_list[i+7] - input_list[i]
-    input_list.append(input_list[i+7] + diff)
+import pymongo
 
-print(input_list)
+
+def get_error_host_and_description():
+    try:
+        # connect local mongodb server
+        client = pymongo.MongoClient("localhost", 26543)
+
+        # setting database and collection name
+        access_db = client["server_data"]
+        access_coll = access_db["access_log"]
+        ip_address_list = access_coll.aggregate(
+            [
+                {
+                    "$group": {
+                        "_id": {"IP": "$IP"},
+                        "count": {"$sum": 1}
+                    }
+                }
+            ]
+        )
+
+        output_list = []
+        for ip_address in ip_address_list:
+            print(ip_address['_id']['IP'])
+            output_list.append(ip_address)
+
+        return output_list
+
+    except Exception as e:
+        print(e)
+    finally:
+        client.close()
+
+
+get_error_host_and_description()

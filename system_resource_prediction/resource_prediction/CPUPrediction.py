@@ -1,6 +1,39 @@
 import elasticsearch
 import datetime
 import time
+import pymongo
+
+
+def get_ip_address_list_in_mongodb():
+    try:
+        # connect local mongodb server
+        client = pymongo.MongoClient("localhost", 26543)
+
+        # setting database and collection name
+        access_db = client["server_data"]
+        access_coll = access_db["access_log"]
+        ip_address_list = access_coll.aggregate(
+            [
+                {
+                    "$group": {
+                        "_id": {"IP": "$IP"},
+                        "count": {"$sum": 1}
+                    }
+                }
+            ]
+        )
+
+        output_list = []
+        for ip_address in ip_address_list:
+            print(ip_address['_id']['IP'])
+            output_list.append(ip_address)
+
+        return output_list
+
+    except Exception as e:
+        print(e)
+    finally:
+        client.close()
 
 
 def calculate_future_usage(input_list):
@@ -126,11 +159,10 @@ def insert_future_data(ip):
 
     # close connection
 
-# get ip address about connected server
-def get_ip_address_list():
-
 
 while(True):
-    ip = "192.168.137.24"
-    insert_future_data(ip)
+    ip_list = get_ip_address_list_in_mongodb()
+    for ip in ip_list:
+        insert_future_data(ip)
+    print("wait 1 day")
     time.sleep(86400)
