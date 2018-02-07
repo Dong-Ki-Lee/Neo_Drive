@@ -5,14 +5,14 @@ import logging
 import time
 import socket
 
-MONITORING_SERVER_IP = '164.125.14.150'
 MONITORING_SERVER_MONGODB_PORT = 26543
 MONITORING_SERVER_DB_INFO_LOGSTASH_PORT = 5958
 MONITORING_SERVER_ERROR_INFO_LOGSTASH_PORT = 5957
 
 # Database ID and Password
-DATABASE_ID = 'monitoring'
-DATABASE_PW = 'monitoringtest'
+DATABASE_ID = input("input mysql monitoring user ID : ")
+DATABASE_PW = input("input mysql monitoring user password : ")
+MONITORING_SERVER_IP = input("input monitoring server IP Address : ")
 # normal value
 NORMAL = 0
 
@@ -23,6 +23,7 @@ system_error_logger.addHandler(logstash.LogstashHandler(
     MONITORING_SERVER_ERROR_INFO_LOGSTASH_PORT,
     version=1)
 )
+
 
 def get_ip_address():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

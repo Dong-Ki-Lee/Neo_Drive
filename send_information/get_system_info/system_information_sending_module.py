@@ -6,7 +6,7 @@ import socket
 from pymongo import MongoClient
 
 
-MONITORING_SERVER_IP = '164.125.14.150'
+MONITORING_SERVER_IP = input("input monitoring server IP Address : ")
 MONITORING_SERVER_MONGODB_PORT = 26543
 MONITORING_SERVER_SYSTEM_INFO_LOGSTASH_PORT = 5959
 MONITORING_SERVER_ERROR_INFO_LOGSTASH_PORT = 5957
@@ -53,7 +53,7 @@ system_error_logger.addHandler(logstash.LogstashHandler(
 
 network = psutil.net_io_counters().packets_recv
 cpu_usage_limit = input("input cpu usage limit this system : ")
-cpu_time_limit = input("input cpu time limit this system : ")
+cpu_time_limit = input("input cpu time limit this system(each 5 second) : ")
 
 cpu_over_limit_time = 0
 ip = get_ip_address()
