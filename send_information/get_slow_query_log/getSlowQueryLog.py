@@ -3,7 +3,7 @@ import logstash
 import logging
 import time
 import socket
-
+import datetime
 
 # Database ID and Password
 DATABASE_ID = 'monitoring'
@@ -53,16 +53,16 @@ while True:
 
     for row in rows:
         if row[4] == 'Query':
-            if 'AUTOCOMMIT' in str(row[5]) or 'KILL' in str(row[5]):
+            if 'AUTOCOMMIT' in str(row[5]) or 'autocommit' in str(row[5]) or 'KILL' in str(row[5]):
                 continue
             if 'SHOW' in str(row[5]) or 'show' in str(row[5]):
                 continue
-            if 'select * from mysql.general_log' in str(row[5]):
+            if 'general_log' in str(row[5]):
                 continue
 
             db_status_information = ()
 
-            temp_tuple = (('OCCUR_TIME', row[0].strftime('%Y-%m-%d %H:%M:%S')),)
+            temp_tuple = (('OCCUR_TIME', (row[0] + datetime.timedelta(hours=-9)).strftime('%Y-%m-%dT%H:%M:%SZ')),)
             db_status_information += temp_tuple
 
             temp_tuple = (('USER', row[1]),)
@@ -75,6 +75,7 @@ while True:
             db_status_information += temp_tuple
 
             query_logger.info(db_status_information)
+            print(db_status_information)
     time.sleep(600)
 
 conn.close()
