@@ -5,11 +5,15 @@ import time
 import socket
 import datetime
 
-# Database ID and Password
-DATABASE_ID = 'monitoring'
-DATABASE_PW = 'monitoringtest'
+# Database ID and Password\
 
-MONITORING_SERVER_IP = '164.125.14.150'
+DATABASE_ID = input("input mysql monitoring user ID : ")
+DATABASE_PW = input("input mysql monitoring user password : ")
+
+SA_DATABASE_ID = input("input mysql root user ID : ")
+SA_DATABASE_PW = input("input mysql root user password : ")
+
+MONITORING_SERVER_IP = input("input monitoring server IP Address : ")
 MONITORING_SERVER_QUERY_INFO_LOGSTASH_PORT = 5956
 
 
@@ -18,6 +22,20 @@ def get_result_sql_execute(sql):
         conn = pymysql.connect(host='localhost', user=DATABASE_ID, password=DATABASE_PW, charset='utf8')
         cursor = conn.cursor()
         cursor.execute(sql)
+        db_status_rows = cursor.fetchall()
+        conn.close()
+    except:
+        db_status_rows = 'mysql connection error'
+        print("error")
+    finally:
+        return db_status_rows
+
+
+def delete_general_log():
+    try:
+        conn = pymysql.connect(host='localhost', user=SA_DATABASE_ID, password=SA_DATABASE_PW, charset='utf8')
+        cursor = conn.cursor()
+        cursor.execute('truncate table mysql.general_log')
         db_status_rows = cursor.fetchall()
         conn.close()
     except:
@@ -76,6 +94,8 @@ while True:
 
             query_logger.info(db_status_information)
             print(db_status_information)
-    time.sleep(600)
 
+    delete_general_log()
+    print("wait 12 hours")
+    time.sleep(43200)
 conn.close()
