@@ -217,7 +217,7 @@ while True:
     else:
         cache_rate = innodb_buffer_pool_reads * 100 / innodb_buffer_pool_read_requests
 
-        cache_rate_tuple = (('Cache_rate', int(cache_rate)), )
+    cache_rate_tuple = (('Cache_rate', int(cache_rate)), )
 
     db_status_information += cache_rate_tuple
 

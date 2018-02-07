@@ -34,7 +34,7 @@ def insert_data_in_mongodb(coll_name, json_data):
     finally:
         return is_success
 
-
+# create logger for system information
 system_information_logger = logging.getLogger('system_information_logger')
 system_information_logger.setLevel(logging.INFO)
 system_information_logger.addHandler(logstash.LogstashHandler(
@@ -43,6 +43,7 @@ system_information_logger.addHandler(logstash.LogstashHandler(
     version=1)
 )
 
+# create logger for error information
 system_error_logger = logging.getLogger('error_logger')
 system_error_logger.setLevel(logging.INFO)
 system_error_logger.addHandler(logstash.LogstashHandler(
@@ -53,8 +54,8 @@ system_error_logger.addHandler(logstash.LogstashHandler(
 
 network = psutil.net_io_counters().packets_recv
 cpu_usage_limit = input("input cpu usage limit this system : ")
-cpu_time_limit = input("input cpu time limit this system(each 5 second) : ")
-
+cpu_time_limit = input("input cpu time limit this system(second) minimum duration 5 seconds : ")
+cpu_time_limit = int(int(cpu_time_limit)/5)
 cpu_over_limit_time = 0
 ip = get_ip_address()
 client_information = {
@@ -74,8 +75,6 @@ while(True):
     network_usage = int((network - network_usage) / 5 / 10240)
 
     system_information = str(cpu) + ' ' + str(mem) + ' ' + str(disk) + ' ' + str(network_usage) + ' ' + cpu_usage_limit + ' ' + ip
-    print(system_information)
-#    psutil.test()
     system_information_logger.info(system_information)
 
     print("insert one data")
@@ -100,5 +99,5 @@ while(True):
     else:
         cpu_over_limit_time = 0
 
-    print("cpu over limit count : " + str(cpu_over_limit_time))
+    print("cpu over limit second : " + str(int(cpu_over_limit_time) * 5))
     time.sleep(5)
