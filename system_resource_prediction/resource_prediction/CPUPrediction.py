@@ -12,6 +12,8 @@ def get_ip_address_list_in_mongodb():
         # setting database and collection name
         access_db = client["server_data"]
         access_coll = access_db["access_log"]
+
+        # grouping access log by ip address
         ip_address_list = access_coll.aggregate(
             [
                 {
@@ -26,7 +28,7 @@ def get_ip_address_list_in_mongodb():
         output_list = []
         for ip_address in ip_address_list:
             print(ip_address['_id']['IP'])
-            output_list.append(ip_address)
+            output_list.append(ip_address['_id']['IP'])
 
         return output_list
 
@@ -49,7 +51,7 @@ def calculate_future_usage(input_list):
     return input_list
 
 
-def insert_future_data(ip):
+def insert_future_data(input_ip_address):
 
     # Time to calculate the past. Here, based on current
     timestamp = datetime.datetime.now().timestamp()
@@ -99,7 +101,7 @@ def insert_future_data(ip):
                                     {
                                       "match_phrase": {
                                         "CLIENT_IP.keyword": {
-                                          "query": "192.168.137.24"
+                                          "query": input_ip_address
                                         }
                                       }
                                     },
@@ -151,13 +153,6 @@ def insert_future_data(ip):
             es_client.index(index="cpu_prediction_data", doc_type="cpu_prediction", body=elastic_data)
             delta_value += 1
         # Delete historical data from elasticsearch
-
-
-    # Less than 14 days of data pass this calculation
-    # else:
-        # if need another process, write this place
-
-    # close connection
 
 
 while(True):
