@@ -77,6 +77,8 @@ def get_error_host_and_description():
         # setting database and collection name
         error_db = client["server_data"]
         error_coll = error_db["error_log"]
+
+        # get error information
         error_aggregation = error_coll.aggregate(
             [
                 {
@@ -113,9 +115,12 @@ while(True):
         for error in error_list:
             content += create_email_content(error)
 
-        print(content)
+        content += '\n자세한 내용은 다음 링크에서 확인하세요\n'
+        content += 'http://164.125.14.150:5601/app/kibana#/dashboards'
 
         send_via_gmail(administrator_list, "Alarm_email", content)
+
+        print("send alarm mail")
     else:
         print("no_error_list")
     print("wait " + str(alarm_timing) + " minutes")

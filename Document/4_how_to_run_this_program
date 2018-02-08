@@ -1,0 +1,32 @@
+how to run this program.
+
+client side.
+
+run 3 python program in client side
+
+database_information_sending_module.py
+database_query_info_sending_module.py
+system_information_sending_module.py
+
+in send_information folder.
+
+Currently only mysql in linux is supported.
+You must create and use a dedicated monitoring account
+
+To run this program,
+Monitoring server PC's IP address, DBMS monitoring user, root user information is needed.
+
+
+server side
+
+4 logstash, elasticsearch, kibana are needed.
+
+first, run elasticsearch and kibana.
+and run 4 logstash with filter 
+db_filter_fix.cnf
+error_filter.cnf
+query_filter.cnf
+system_filter_fix.cnf
+in logstash_filter folder.
+
+
