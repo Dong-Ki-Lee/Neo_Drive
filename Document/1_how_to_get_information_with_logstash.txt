@@ -9,3 +9,9 @@ sudo ./logstash -f "your_download_location"/Neo_Drive/logstash_filter/system_fil
 
 3-2. get db information logstash
 sudo ./logstash -f "your_download_location"/Neo_Drive/logstash_filter/db_filter.cnf
+
+3-3. get db query information logstash 
+sudo ./logstash -f "your_download_location"/Neo_Drive/logstash_filter/query_filter.cnf
+
+3-4. get error information logstash
+sudo ./logstash -f "your_download_location"/Neo_Drive/logstash_filter/error_filter.cnf
