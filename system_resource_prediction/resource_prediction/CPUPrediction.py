@@ -4,14 +4,14 @@ import time
 import pymongo
 
 
-def get_ip_address_list_in_mongodb():
+def get_client_ip_address_list_in_access_log():
     try:
         # connect local mongodb server
-        client = pymongo.MongoClient("localhost", 26543)
+        mongo_client = pymongo.MongoClient("localhost", 26543)
 
         # setting database and collection name
-        access_db = client["server_data"]
-        access_coll = access_db["access_log"]
+        server_db = mongo_client["server_data"]
+        access_coll = server_db["access_log"]
 
         # grouping access log by ip address
         ip_address_list = access_coll.aggregate(
@@ -35,7 +35,7 @@ def get_ip_address_list_in_mongodb():
     except Exception as e:
         print(e)
     finally:
-        client.close()
+        mongo_client.close()
 
 
 def calculate_future_usage(input_list):
@@ -61,7 +61,8 @@ def insert_future_data(input_ip_address):
     # Connect Elasticsearch for getting Usage Value. Now just calculate CPU
     es_client = elasticsearch.Elasticsearch("localhost:9200")
 
-    docs = es_client.search(index='system_information',
+    # Get usage data use aggregation
+    usage_data = es_client.search(index='system_information',
                             doc_type='doc',
                             body={
                               "size": 0,
@@ -123,15 +124,16 @@ def insert_future_data(input_ip_address):
                             })
 
     # More than 14 days of data must be stored to perform the calculation
-    if (len(docs['aggregations']['2']['buckets'])) >= 14:
+    if (len(usage_data['aggregations']['2']['buckets'])) >= 14:
 
         cpu_usage_list = []
 
         # Add list CPU usage past 2 weeks
-        for doc in docs['aggregations']['2']['buckets']:
+        for doc in usage_data['aggregations']['2']['buckets']:
             # print(int(doc['1']['value']))
             cpu_usage_list.append(int(doc['1']['value']))
 
+        # if get 15 days data, only get recent 14 days data.
         if len(cpu_usage_list) > 14:
             cpu_usage_list = cpu_usage_list[1:]
 
@@ -155,9 +157,10 @@ def insert_future_data(input_ip_address):
         # Delete historical data from elasticsearch
 
 
-while(True):
-    ip_list = get_ip_address_list_in_mongodb()
-    for ip in ip_list:
-        insert_future_data(ip)
-    print("wait 1 day")
-    time.sleep(86400)
+if __name__ == "__main__":
+    while True:
+        ip_list = get_client_ip_address_list_in_access_log()
+        for ip in ip_list:
+            insert_future_data(ip)
+        print("wait 1 day")
+        time.sleep(86400)
