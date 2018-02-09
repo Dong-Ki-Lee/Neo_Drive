@@ -16,6 +16,10 @@ You must create and use a dedicated monitoring account
 To run this program,
 Monitoring server PC's IP address, DBMS monitoring user, root user information is needed.
 
+If you want to use query_infomation, need to set general_log is on.
+
+=> set global general_log=on;
+
 
 server side
 
