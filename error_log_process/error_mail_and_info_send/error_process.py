@@ -4,54 +4,59 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-MAIL_ACCOUNT = "vinedingproject@gmail.com"
-MAIL_PASSWORD = "onlysendmail"
+ALARM_MAIL_SEND_ACCOUNT_ID = "vinedingproject@gmail.com"
+ALARM_MAIL_SEND_ACCOUNT_PW = "onlysendmail"
+SMTP_SERVER_ADDRESS_GMAIL = "smtp.gmail.com:587"
+DB_PORT = 26543
 
 
-def send_via_gmail(to_list, title, description):
+def send_email_use_smtp(recipient_list, title, content_string):
     try:
-        from_address = MAIL_ACCOUNT
-        s = smtplib.SMTP('smtp.gmail.com:587')
-        s.starttls()
-        s.login(MAIL_ACCOUNT, MAIL_PASSWORD)
-        msg = get_message_formatted(from_address, title, description)
-        for to in to_list:
+        # connect and login smtp email server
+        smtp = smtplib.SMTP(SMTP_SERVER_ADDRESS_GMAIL)
+        smtp.starttls()
+        smtp.login(
+            ALARM_MAIL_SEND_ACCOUNT_ID,
+            ALARM_MAIL_SEND_ACCOUNT_PW
+        )
+
+        # transform string to email content
+        msg = MIMEMultipart('localhost')
+        msg['Subject'] = title
+        msg['From'] = ALARM_MAIL_SEND_ACCOUNT_ID
+
+        content_email_form = MIMEText(content_string, 'plain', _charset="utf-8")
+        msg.attach(content_email_form)
+
+        # send email all recipients
+        for recipient in recipient_list:
             try:
-                s.sendmail(from_address, to, msg.as_string())
+                smtp.sendmail(ALARM_MAIL_SEND_ACCOUNT_ID, recipient, msg.as_string())
 
-            except Exception as e:
-                print(e)
-                print("email_send_error")
-    except Exception as e:
-        print(e)
-        print("login error")
+            except Exception as exception:
+                print(exception)
+                print("Email is not sent due to error")
 
-
-def get_message_formatted(from_address, title, description):
-    msg = MIMEMultipart('localhost')
-    msg['Subject'] = title
-    msg['From'] = from_address
-
-    content = MIMEText(description, 'plain', _charset="utf-8")
-    msg.attach(content)
-    return msg
+    except Exception as exception:
+        print(exception)
+        print("Login Failed")
 
 
 def get_administrator_email_list():
     try:
-        client = pymongo.MongoClient("localhost", 26543)
+        client = pymongo.MongoClient("localhost", DB_PORT)
 
         admin_db = client["administrator"]
         admin_coll = admin_db["administrator_list"]
 
-        admin_list = admin_coll.find()
+        admin_information = admin_coll.find()
 
-        output_list = []
+        admin_account_list = []
 
-        for admin in admin_list:
-            output_list.append(admin['email_address'])
+        for admin in admin_information:
+            admin_account_list.append(admin['email_address'])
 
-        return output_list
+        return admin_account_list
     except Exception as e:
         print(e)
     finally:
@@ -72,14 +77,14 @@ def create_email_content(error_json):
 def get_error_host_and_description():
     try:
         # connect local mongodb server
-        client = pymongo.MongoClient("localhost", 26543)
+        client = pymongo.MongoClient("localhost", DB_PORT)
 
         # setting database and collection name
         error_db = client["server_data"]
         error_coll = error_db["error_log"]
 
         # get error information
-        error_aggregation = error_coll.aggregate(
+        error_aggregation_output = error_coll.aggregate(
             [
                 {
                     "$group": {
@@ -89,39 +94,42 @@ def get_error_host_and_description():
                 }
             ]
         )
-
-        output_list = []
-        for error in error_aggregation:
-            print(error)
-            output_list.append(error)
-
         error_coll.drop()
-        return output_list
+
+        error_list = []
+        for error_info in error_aggregation_output:
+            print(error_info)
+            error_list.append(error_info)
+
+        return error_list
 
     except Exception as e:
         print(e)
     finally:
         client.close()
 
-alarm_timing = input("input alarm interval(minute) : ")
 
-while(True):
-    administrator_list = get_administrator_email_list()
+if __name__ == "__main__":
 
-    error_list = get_error_host_and_description()
+    alarm_timing = input("input alarm interval(minute) : ")
 
-    content = ''
-    if len(error_list) > 0:
-        for error in error_list:
-            content += create_email_content(error)
+    while True:
+        administrator_list = get_administrator_email_list()
 
-        content += '\n자세한 내용은 다음 링크에서 확인하세요\n'
-        content += 'http://164.125.14.150:5601/app/kibana#/dashboards'
+        error_list = get_error_host_and_description()
 
-        send_via_gmail(administrator_list, "Alarm_email", content)
+        content = ''
+        if len(error_list) > 0:
+            for error in error_list:
+                content += create_email_content(error)
 
-        print("send alarm mail")
-    else:
-        print("no_error_list")
-    print("wait " + str(alarm_timing) + " minutes")
-    time.sleep(60 * int(alarm_timing))
+            content += '\n자세한 내용은 다음 링크에서 확인하세요\n'
+            content += 'http://164.125.14.150:5601/app/kibana#/dashboards'
+
+            send_email_use_smtp(administrator_list, "Alarm_email", content)
+
+            print("send alarm mail")
+        else:
+            print("no_error_list")
+        print("wait " + str(alarm_timing) + " minutes")
+        time.sleep(60 * int(alarm_timing))
