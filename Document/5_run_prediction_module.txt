@@ -1,0 +1,11 @@
+시스템 예측 모듈의 경우, 계산에 들어가는 시스템 자원 양이 많을 수 있다.
+monitoring service를 이용하는 중에 예측 계산이 시작된다면 확인 중에 지연이 있을 수 있기 때문에
+모니터링 시스템을 사용하지 않을 때 프로그램이 실행되도록 하는 것이 바람직하다.
+
+정해진 시간에 예측을 실행하기 위해서 Linux에서는 crontab을 이용한다.
+
+crontab 설정 방법
+1. sudo vim /etc/crontab
+2. add line
+ex) if you want run pretiction program at 4 am, add
+0 4 * * * username python3.6 ~/Neo_Drive/system_resource_prediction/resource_prediction/CPUPrediction.py
