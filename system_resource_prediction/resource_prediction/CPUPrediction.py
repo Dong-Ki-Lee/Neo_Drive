@@ -158,9 +158,8 @@ def insert_future_data(input_ip_address):
 
 
 if __name__ == "__main__":
-    while True:
-        ip_list = get_client_ip_address_list_in_access_log()
-        for ip in ip_list:
-            insert_future_data(ip)
-        print("wait 1 day")
-        time.sleep(86400)
+
+    ip_list = get_client_ip_address_list_in_access_log()
+    for ip in ip_list:
+        insert_future_data(ip)
+    print("wait 1 day")
