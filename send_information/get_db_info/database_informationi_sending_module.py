@@ -35,10 +35,7 @@ def get_ip_address():
 
 
 def get_ip_address_tuple():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    # if use intranet only, use host name monitoring server
-    ip = s.getsockname()[0]
+    ip = get_ip_address()
     ip_tuple = (('CLIENT_IP', ip),)
     s.close()
     return ip_tuple
